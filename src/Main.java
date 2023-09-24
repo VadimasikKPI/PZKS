@@ -2,7 +2,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String expression = "f1(2.1+b)+(A+B)*a(5.0,b)+5+C/D+G+(K/L+M+N)";
+        String expression = "-f(c, e++, 4m)/h[k+i] - 2.0005^(N-1)+(1-L) - s(t_1+e*m) - 1.7/kgh-b+g(e, 1)*(l - 0)";
+        String part = "g(e, 1)*(l - 0";
         Analyzer analyzer = new Analyzer();
         List<String> errors = analyzer.analyze(expression);
 

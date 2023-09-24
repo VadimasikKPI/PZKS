@@ -3,7 +3,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Analyzer {
-    private Stack<Character> brackets = new Stack<>();
+    private int brackets = 0;
+    private int figureBrackets = 0;
+    private int squareBrackets = 0;
     private Stack<Character> variables = new Stack<>();
     private List<String> errors = new ArrayList<>();
     private List<Integer> errorPositions = new ArrayList<>();
@@ -19,22 +21,22 @@ public class Analyzer {
 
         for (int i = 0; i < characters.size(); i++) {
             if (characters.get(i) == '(') {
-                if(i+1!=characters.size()+1 && isOperator(characters.get(i+1))){
+                if(i+1!=characters.size() && isOperator(characters.get(i+1))){
                     errors.add("Операція " + characters.get(i+1) + " після відкритої душки. Позиція - " + (i+1));
                     errorPositions.add(i);
                 }
-                else if(i-1!=-1 && !isOperator(characters.get(i-1))){//тут треба додати перевірку на ім'я функції
+                else if(i-1!=-1 && !isOperator(characters.get(i-1))){
                     errors.add("Перед '(' не має знаку операції. Позиція - " + (i+1));
                     errorPositions.add(i);
                 }
-                brackets.push(characters.get(i));
+                brackets += 1;
             }
             else if (characters.get(i) == ')') {
                 if(i==0){
                     errors.add("Душка ')' на початку виразу. Позиція - " + (i+1));
                     errorPositions.add(i);
                 }
-                else if(brackets.isEmpty()){
+                else if(brackets == 0){
                     errors.add("Душка ')' не має відкриваючої душки. Позиція - " + (i+1));
                     errorPositions.add(i);
                 }
@@ -46,16 +48,59 @@ public class Analyzer {
                     errors.add("Операція " + characters.get(i-1) + " перед ')'. Позиція - " + (i+1));
                     errorPositions.add(i);
                 }
-                else if(i+1!=characters.size() && !isOperator(characters.get(i+1))){
+                else if(i+1!=characters.size() && !isOperator(characters.get(i+1)) && !isOperator(characters.get(i+2))){
                     errors.add("Після ')' не має операції. Позиція - " + (i+1));
                     errorPositions.add(i);
                 }
-                brackets.pop();
+                brackets -=1;
+            }
+            else if(characters.get(i)==' '){
+                if(i+1!=characters.size() && characters.get(i+1)==' '){
+                    errors.add("Забагато пробілів. Позиція - " + (i+1));
+                    errorPositions.add(i);
+                    errorPositions.add(i+1);
+                }
+            }
+            else if(characters.get(i)==';'){
+                errors.add("Символ ';' в не правильному місці. Позиція - " + (i+1));
+                errorPositions.add(i);
+            }
+            else if(characters.get(i)=='{'){
+                figureBrackets+=1;
+            }
+            else if(characters.get(i)=='}'){
+                if(figureBrackets!=0){
+                    figureBrackets-=1;
+                }
+                else {
+                    errors.add("Душка '}' не має відкриваючої душки. Позиція - " + (i+1));
+                    errorPositions.add(i);
+                }
+            }
+            else if(characters.get(i)=='['){
+                squareBrackets+=1;
+            }
+            else if(characters.get(i)==']'){
+                if(squareBrackets!=0){
+                    squareBrackets-=1;
+                }
+                else {
+                    errors.add("Душка ']' не має відкриваючої душки. Позиція - " + (i+1));
+                    errorPositions.add(i);
+                }
+            }
+            else if(isSpecialCharacter(characters.get(i))){
+                errors.add("В тілі функції помилка. Позиція - " + i);
+                errorPositions.add(i);
             }
             else if (isOperator(characters.get(i))) {
                 if(i==0){
-                    errors.add("Знак " + characters.get(i) + " на початку виразу. Позиція - " + (i+1));
-                    errorPositions.add(i);
+                    if(characters.get(i)=='-' && isFunctionOrVariable(characters, i+1)) continue;
+                    else{
+                        errors.add("Знак " + characters.get(i) + " на початку виразу. Позиція - " + (i+1));
+                        errorPositions.add(i);
+                    }
+
                 }
                 else if(i==characters.size()-1){
                     errors.add("Знак " + characters.get(i) + " на кінці виразу. Позиція - " + (i+1));
@@ -83,15 +128,21 @@ public class Analyzer {
                 }
             }
         }
-        if(!brackets.isEmpty()){
+        if(brackets !=0 ){
             errors.add("Нерівна кількість відкритих та закритих дужок");
+        }
+        if (figureBrackets!=0){
+            errors.add("Нерівна кількість фігурних дужок");
+        }
+        if(squareBrackets!=0){
+            errors.add("Нерівна кількість квадратиних дужок");
         }
 
         return errors;
     }
 
     private boolean isOperator(char c) {
-        return c == '+' || c == '-' || c == '*' || c == '/';
+        return c == '+' || c == '-' || c == '*' || c == '/' || c=='^';
     }
 
     private int isVariable(List<Character> characters, int startPosition){
@@ -202,20 +253,32 @@ public class Analyzer {
         int variablesCount = 0;
         String pattern = "^[a-zA-Z_][a-zA-Z0-9_]*$";
         StringBuilder builder = new StringBuilder();
-        for(int i = startBodyPosition+1;i<endPosition-1;i++){
+        for(int i = startBodyPosition+1;i<endPosition;i++){
             if(Character.isAlphabetic(characters.get(i)) || Character.isDigit(characters.get(i)) || characters.get(i)=='.'){
                 builder.append(characters.get(i));
 
             }
-            else if(isOperator(characters.get(i)) || characters.get(i)==','){
+            else if(isOperator(characters.get(i)) || characters.get(i)==',' || characters.get(i)==';' || characters.get(i)==' '){
+                if(characters.get(i-1)=='(' || characters.get(i+1)==')'){
+                        errors.add("В тілі функції помилка. Позиція - " + startBodyPosition);
+                        for(int j = startBodyPosition;j<=i;j++) {
+                            errorPositions.add(j);
+                        }
 
-                if(!Pattern.matches(pattern, builder) && !isDouble(builder.toString())){
+                }
+                else if(isSpecialCharacter(characters.get(i))){
+                    errors.add( characters.get(i) + " в не правильному місці. Позиція - " + i);
+                    errorPositions.add(i);
+
+                }
+                else if(!Pattern.matches(pattern, builder) && !isDouble(builder.toString())){
                     errors.add("В тілі функції помилка. Позиція - " + startBodyPosition);
                     for(int j = startBodyPosition;j<=i;j++) {
                         errorPositions.add(j);
                     }
                     builder.trimToSize();
                 }
+
             }
         }
     }
@@ -237,7 +300,10 @@ public class Analyzer {
             }
         }
     }
-
+    public boolean isSpecialCharacter(char c){
+        return c == '&' || c == '|' || c == '%' || c == '$' || c=='#' ||
+                c == '!' || c == '@' || c == '?' || c == '{' || c=='}' || c==';';
+    }
     public boolean isDouble(String str){
         try {
             double value = Double.parseDouble(str);
