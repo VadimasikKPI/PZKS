@@ -2,7 +2,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String expression = "-f(c, e++, 4m)/h[k+i] - 2.0005^(N-1)-(1-L) + s(t_1+e*m) - 1,7/kgh+b-g(e, 1)-(- 0)";
+        String expression = "-f(1*0)- an*0p(a+b)-1.0005/6*(f(b,1.8-a*(2-6))/1+(b+a)/(6x^2+4x-1) + d/dt*(smn(at+q)/(4cos(at)-ht^2)";
         Analyzer analyzer = new Analyzer();
         List<String> errors = analyzer.analyze(expression);
 

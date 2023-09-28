@@ -259,11 +259,9 @@ public class Analyzer {
 
             }
             else if(isOperator(characters.get(i)) || characters.get(i)==',' || characters.get(i)==';' || characters.get(i)==' '){
-                if(characters.get(i-1)=='(' || characters.get(i+1)==')'){
-                        errors.add("В тілі функції помилка. Позиція - " + startBodyPosition);
-                        for(int j = startBodyPosition;j<=i;j++) {
-                            errorPositions.add(j);
-                        }
+                if(characters.get(i+1)==')'){
+                        errors.add("В тілі функції помилка. Позиція - " + characters.get(i));
+                        errorPositions.add(i);
 
                 }
                 else if(isSpecialCharacter(characters.get(i))){
@@ -272,7 +270,7 @@ public class Analyzer {
 
                 }
                 else if(!Pattern.matches(pattern, builder) && !isDouble(builder.toString())){
-                    errors.add("В тілі функції помилка. Позиція - " + startBodyPosition);
+                    errors.add("В тілі функції помилка. Позиція - " + characters.get(i));
                     for(int j = startBodyPosition;j<=i;j++) {
                         errorPositions.add(j);
                     }
