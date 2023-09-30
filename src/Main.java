@@ -3,7 +3,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         String expression = "-f(c, e++, 4m)/h[k+i] - 2.0005^(N-1)-(1-L) + s(t_1+e*m) - 1,7/kgh+b-g(e, 1)-(1- 0)";
-        String part = "(A+B)+C/D+G+(K/L+M+N)";
+        String part = "a+b+c+d+e+f+g+h";
         Analyzer analyzer = new Analyzer();
         List<String> errors = analyzer.analyze(part);
 
