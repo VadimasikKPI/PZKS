@@ -59,6 +59,10 @@ public class Analyzer {
                 }
                 brackets -=1;
             }
+            else if(characters.get(0)=='.'){
+                errors.add("Крапка на початку виразу " + (i+1));
+                errorPositions.add(i);
+            }
             else if(characters.get(i)==' '){
                 if(i+1!=characters.size() && characters.get(i+1)==' '){
                     errors.add("Забагато пробілів. Позиція - " + (i+1));
@@ -115,6 +119,20 @@ public class Analyzer {
                     errors.add("Подвійні операції " + characters.get(i) + " та " + characters.get(i+1)+ ". Позиція - " + (i+1) + " та "+ (i+2));
                     errorPositions.add(i);
                     errorPositions.add(i+1);
+                }
+                else if(characters.get(i)=='/' && i+2<characters.size()){
+                    if(characters.get(i+1)=='0' && characters.get(i+2)!='.'){
+                        errors.add("Ділення на нуль. Позиція - " + (i+1));
+                        errorPositions.add(i);
+                        errorPositions.add(i+1);
+                    }
+                }
+                else if(characters.get(i)=='*' && i+2<characters.size()){
+                    if(characters.get(i+1)=='0' && characters.get(i+2)!='.'){
+                        errors.add("Ділення на нуль. Позиція - " + (i+1));
+                        errorPositions.add(i);
+                        errorPositions.add(i+1);
+                    }
                 }
 
             }
@@ -251,11 +269,11 @@ public class Analyzer {
     public boolean isFunctionOrVariable(List<Character> characters, int startPosition){
         boolean isFunc = false;
         for(int i = startPosition;i<characters.size();i++){
-            if(characters.get(i+1)=='(' && !isOperator(characters.get(i+1)) && i+1!=characters.size()){
+            if(i+1<characters.size() && characters.get(i+1)=='(' && !isOperator(characters.get(i+1)) && i+1!=characters.size()){
                 isFunc = true;
                 break;
             }
-            else if(characters.get(i+1)==')' || isOperator(characters.get(i+1)) || characters.get(i+1)==','){
+            else if(i+1<characters.size()&&characters.get(i+1)==')' || isOperator(characters.get(i+1)) || characters.get(i+1)==','){
                 break;
             }
 
