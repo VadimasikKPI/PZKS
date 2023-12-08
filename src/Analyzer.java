@@ -415,8 +415,9 @@ public class Analyzer {
     }
 
 
-    public void printCorrectExpression(String expression, List<Integer> errors){
+    public List<Character> printCorrectExpression(String expression, List<Integer> errors){
         List<Character> arr = new ArrayList<>();
+        List<Character> correct = new ArrayList<>();
         for (char c : expression.toCharArray()) {
             arr.add(c);
         }
@@ -425,11 +426,17 @@ public class Analyzer {
                 System.out.print(ANSI_RED_BACKGROUND
                         + arr.get(i)
                         + ANSI_RESET);
+                correct.add(arr.get(i));
+            }
+            else if(arr.get(i) == ' '){
+                //arr.remove(i);
             }
             else {
                 System.out.print(arr.get(i));
+                correct.add(arr.get(i));
             }
         }
+        return correct;
     }
     public boolean isSpecialCharacter(char c){
         return c == '&' || c == '|' || c == '%' || c == '$' || c=='#' ||
