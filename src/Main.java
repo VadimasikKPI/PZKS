@@ -41,17 +41,12 @@ public class Main {
     }
 
     public static void laba6(){
-        String part = "a+(b*a-c-a*b*c)+b*c+c+c*d*e+e*f+k*(d+f+2*(a-c*e+w)-q*t)";
+        String part = "a+(b+c+d*(e+f)+g)+h+f(a)";
         Analyzer analyzer = new Analyzer();
         ExpressionConverter expressionConverter = new ExpressionConverter();
         Worker worker = new Worker();
         String comutations = worker.generateComutations1(part);
-        List<String> distribution = worker.distribWithSteps(part);
-        System.out.println("Distribs: ");
-        for(String s: distribution){
-            System.out.println(s);
-        }
-        String distributions = distribution.get(distribution.size()-1);
+        String distributions = worker.distrib(part);
         System.out.println("Comutations: " + comutations);
         System.out.println("Distributions: " + distributions);
         List<Character> correct = analyzer.printCorrectExpression(part, analyzer.getErrorPositions());

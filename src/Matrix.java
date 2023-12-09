@@ -58,13 +58,14 @@ public class Matrix {
     public int processTree(TreeNode root) {//main method
         Map<Integer, OperationInformation> operationsMap = new HashMap<>();
         IntTree inttree = tree(root);
-
+        operationNumber = 1;
         postOrderTraversal(inttree, operationsMap, root);
         System.out.println();
         for (Map.Entry<Integer, OperationInformation> entry : operationsMap.entrySet()) {
             System.out.println(entry.getValue().number + " | " + entry.getValue().operation + " | " + entry.getValue().requieredOperations);
         }
-        List<Integer> sortedOperations = topologicalSort(operationsMap);
+        List<Integer> sortedOperations = new ArrayList<>();
+        sortedOperations = topologicalSort(operationsMap);
 //        System.out.println("Topological order: " + sortedOperations);
         List<List<String>> result = mapAlgorithm(operationsMap, sortedOperations);
         System.out.println("Найгірший час виконання: " + worstTime(operationsMap));
@@ -328,6 +329,7 @@ public class Matrix {
                             }
                             isInserted = true;
                             processorNumber = firstProcessor;
+                            taskNumber = sorted.get(i);
                         }
 //                        for(int l = 0;l<calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation());l++){
 //                            processors.get(firstProcessor).add(sorted.get(i).toString());
@@ -397,25 +399,11 @@ public class Matrix {
                                 processors.get(secondProcessorNumber).add(sorted.get(i).toString());
                             }
                             time = calculateTime(processors);
-                            if(time<tempTime && !priority.contains(j)){
-                                tempTime = time;
-                                processorNumber = j;
-                                taskNumber = sorted.get(i);
-                                previousTaskNumber = sorted.get(i);
-                                resultTime = time;
-                            }
-                            else if(time==tempTime && !priority.contains(j)){
-                                if(processors.get(j).size()<processors.get(processorNumber).size()){
-                                    tempTime = time;
-                                    processorNumber = j;
-                                    taskNumber = sorted.get(i);
-                                    previousTaskNumber = sorted.get(i);
-                                    resultTime = time;
-                                }
-                            }
+                            processorNumber = secondProcessorNumber;
+                            taskNumber = sorted.get(i);
+                            previousTaskNumber = sorted.get(i);
                             j = processors.size()-1;
                             isInserted = true;
-                            processorNumber = closerProcessor;
                         }
                         else if(closerProcessor==firstProcessorNumber){
 
@@ -474,25 +462,12 @@ public class Matrix {
                                 processors.get(firstProcessorNumber).add(sorted.get(i).toString());
                             }
                             time = calculateTime(processors);
-                            if(time<tempTime && !priority.contains(j)){
-                                tempTime = time;
-                                processorNumber = j;
-                                taskNumber = sorted.get(i);
-                                previousTaskNumber = sorted.get(i);
-                                resultTime = time;
-                            }
-                            else if(time==tempTime && !priority.contains(j)){
-                                if(processors.get(j).size()<processors.get(processorNumber).size()){
-                                    tempTime = time;
-                                    processorNumber = j;
-                                    taskNumber = sorted.get(i);
-                                    previousTaskNumber = sorted.get(i);
-                                    resultTime = time;
-                                }
-                            }
+                            processorNumber = firstProcessorNumber;
+                            taskNumber = sorted.get(i);
+                            previousTaskNumber = sorted.get(i);
                             j = processors.size()-1;
                             isInserted = true;
-                            processorNumber = closerProcessor;
+
                         }
                         else{
                             for(int z = 0;z<functions.size();z++){
@@ -508,22 +483,9 @@ public class Matrix {
                                 processors.get(firstProcessorNumber).add(sorted.get(i).toString());
                             }
                             time = calculateTime(processors);
-                            if(time<tempTime && !priority.contains(j)){
-                                tempTime = time;
-                                processorNumber = j;
-                                taskNumber = sorted.get(i);
-                                previousTaskNumber = sorted.get(i);
-                                resultTime = time;
-                            }
-                            else if(time==tempTime && !priority.contains(j)){
-                                if(processors.get(j).size()<processors.get(processorNumber).size()){
-                                    tempTime = time;
-                                    processorNumber = j;
-                                    taskNumber = sorted.get(i);
-                                    previousTaskNumber = sorted.get(i);
-                                    resultTime = time;
-                                }
-                            }
+                            processorNumber = firstProcessorNumber;
+                            taskNumber = sorted.get(i);
+                            previousTaskNumber = sorted.get(i);
                             j = processors.size();
                             isInserted = true;
                         }

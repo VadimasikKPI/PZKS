@@ -230,6 +230,7 @@ public class Worker {
                                         }
                                     }
                                 } else {
+                                    sb.append(previousOperator);
                                     for (int j = i + 1; j < end; j++) {
                                         sb.append(expression.charAt(j));
                                     }
@@ -472,6 +473,12 @@ public class Worker {
                     }
                 }
             } else if (Character.isLetterOrDigit(expression.charAt(i)) || expression.charAt(i) == '.') {
+                if(isFunc(expression.toString(), i)){
+                    int end = findClosingBracket(expression.toString(), i+1);
+                    sb.append(expression.substring(i-1, end+1));
+                    i = end;
+                    break;
+                }
                 String variable = findNextVariable(expression.toString(), i);
                 int endOfVariable = findEndOfVariable(variable, i);
                 if (isNextMultiplyOrDivideAndBrackets(expression.toString(), endOfVariable)) {
@@ -1269,6 +1276,19 @@ public class Worker {
         return result.toString();
     }
 
-
+    public boolean isFunc(String exp, int start){
+        if(exp.length()==1){
+            return false;
+        }
+        for(int i = start;i<exp.length();i++){
+            if(exp.charAt(i)=='('){
+                return true;
+            }
+            else if(isOperator(exp.charAt(i))){
+                return false;
+            }
+        }
+        return false;
+    }
 
 }
