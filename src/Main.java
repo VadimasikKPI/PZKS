@@ -46,7 +46,8 @@ public class Main {
         ExpressionConverter expressionConverter = new ExpressionConverter();
         Worker worker = new Worker();
         String comutations = worker.generateComutations1(part);
-        String distributions = worker.distrib(part);
+        List<String> distribution = worker.distribWithSteps(part);
+        String distributions = distribution.get(distribution.size()-1);
         System.out.println("Comutations: " + comutations);
         System.out.println("Distributions: " + distributions);
         List<Character> correct = analyzer.printCorrectExpression(part, analyzer.getErrorPositions());
