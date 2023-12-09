@@ -47,6 +47,10 @@ public class Main {
         Worker worker = new Worker();
         String comutations = worker.generateComutations1(part);
         List<String> distribution = worker.distribWithSteps(part);
+        System.out.println("Distribs: ");
+        for(String s: distribution){
+            System.out.println(s);
+        }
         String distributions = distribution.get(distribution.size()-1);
         System.out.println("Comutations: " + comutations);
         System.out.println("Distributions: " + distributions);
