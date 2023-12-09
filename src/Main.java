@@ -24,14 +24,14 @@ public class Main {
 //        }
 //        analyzer.printCorrectExpression(expression, analyzer.getErrorPositions());
         Worker worker = new Worker();
-        //List<String> comutations = worker.generateComutations(expression);
+        List<String> comutations = worker.generateComutations(expression);
         List<String> distributions = worker.generateDistributions1(expression1);
 //        System.out.println("Comutations:");
         int i = 1;
-//        for(String comutation : comutations){
-//            System.out.println(i+": "+comutation);
-//            i++;
-//        }
+        for(String comutation : comutations){
+            System.out.println(i+": "+comutation);
+            i++;
+        }
         i=1;
         System.out.println("Distributions:");
         for (String distribution : distributions) {
