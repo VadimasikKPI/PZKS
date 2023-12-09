@@ -55,7 +55,7 @@ public class Matrix {
 
         return new ArrayList<>(Arrays.asList(-1));
     }
-    public void processTree(TreeNode root) {//main method
+    public int processTree(TreeNode root) {//main method
         Map<Integer, OperationInformation> operationsMap = new HashMap<>();
         IntTree inttree = tree(root);
 
@@ -71,6 +71,7 @@ public class Matrix {
         System.out.println("Час виконання: " + calculateTime(result));
         System.out.println("Коефіцієнт прискорення: " + (double)worstTime(operationsMap)/calculateTime(result));
         System.out.println("Коефіцієнт ефективності: " + (double)worstTime(operationsMap)/(calculateTime(result)*8));
+        return calculateTime(result);
     }
 
     private int worstTime(Map<Integer,OperationInformation> operationsMap) {
