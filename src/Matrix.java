@@ -245,7 +245,7 @@ public class Matrix {
                         else{
                             for(int k = 0;k<processors.size();k++){
                                 if(processors.get(k).size()!=processors.get(processorNumber).size()){
-                                    for(int l = 0;l<processors.get(processorNumber).size();l++){
+                                    while(processors.get(k).size()!=processors.get(processorNumber).size()){
                                         processors.get(k).add("Empty");
                                     }
                                 }
@@ -392,21 +392,22 @@ public class Matrix {
                                     }
                                 }
                             }
+
                             for(int l = 0;l<calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation());l++){
                                 processors.get(secondProcessorNumber).add(sorted.get(i).toString());
                             }
                             time = calculateTime(processors);
-                            if(time<tempTime && !priority.contains(j)){
+                            if(time<tempTime && priority.contains(j)){
                                 tempTime = time;
-                                processorNumber = j;
+                                processorNumber = secondProcessorNumber;
                                 taskNumber = sorted.get(i);
                                 previousTaskNumber = sorted.get(i);
                                 resultTime = time;
                             }
-                            else if(time==tempTime && !priority.contains(j)){
+                            else if(time==tempTime && priority.contains(j)){
                                 if(processors.get(j).size()<processors.get(processorNumber).size()){
                                     tempTime = time;
-                                    processorNumber = j;
+                                    processorNumber = secondProcessorNumber;
                                     taskNumber = sorted.get(i);
                                     previousTaskNumber = sorted.get(i);
                                     resultTime = time;
@@ -473,17 +474,17 @@ public class Matrix {
                                 processors.get(firstProcessorNumber).add(sorted.get(i).toString());
                             }
                             time = calculateTime(processors);
-                            if(time<tempTime && !priority.contains(j)){
+                            if(time<tempTime && priority.contains(j)){
                                 tempTime = time;
-                                processorNumber = j;
+                                processorNumber = firstProcessorNumber;
                                 taskNumber = sorted.get(i);
                                 previousTaskNumber = sorted.get(i);
                                 resultTime = time;
                             }
-                            else if(time==tempTime && !priority.contains(j)){
+                            else if(time==tempTime && priority.contains(j)){
                                 if(processors.get(j).size()<processors.get(processorNumber).size()){
                                     tempTime = time;
-                                    processorNumber = j;
+                                    processorNumber = firstProcessorNumber;
                                     taskNumber = sorted.get(i);
                                     previousTaskNumber = sorted.get(i);
                                     resultTime = time;
