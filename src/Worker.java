@@ -56,6 +56,9 @@ public class Worker {
                 sb.append(term.substring(0, startBracket) + "(");
                 sb.append(generateComutations1(term.substring(startBracket + 1, endBracket)));
                 sb.append(")");
+                if(term.length()>endBracket+1){
+                    sb.append(term.substring(endBracket+1));
+                }
             } else {
                 if (number == 0 && term.charAt(0) == '+') {
                     sb.append(term.substring(1));
@@ -70,12 +73,28 @@ public class Worker {
         return sb.toString();
     }
 
-    public String preprocess(String expression) {
+    public String preprocess(String exp) {
         StringBuilder sb = new StringBuilder();
+        StringBuilder expression = new StringBuilder();
+        expression.append(exp);
         for(int i = 0; i<expression.length();i++){
             if(expression.charAt(i)=='('){
-                int end = findClosingBracket(expression, i);
-                if(i>0){
+                int end = findClosingBracket(expression.toString(), i);
+                if(expression.substring(i+1, end).contains("(")){
+                    String temp = preprocess(expression.substring(i + 1, end));
+                    if(temp.equals(expression.substring(i + 1, end)) ){
+                        sb.append(expression.substring(i+1, end));
+                        i = end;
+                        //break;
+                    }
+                    else{
+                        expression.replace(i + 1, end, temp);
+                        i=i-1;
+                    }
+//                    expression.replace(i+1, end, preprocess(expression.substring(i+1, end)));
+//                    i = i-1;
+                }
+                else if(i>0){
                     char previousOperator = expression.charAt(i-1);
                     if(previousOperator=='+'){
                         for(int j = i+1;j<end;j++){
@@ -164,7 +183,13 @@ public class Worker {
 
                 }
                 while (j < expression.length() && expression.charAt(j) != '+' && expression.charAt(j) != '-') {
-                    j++;
+                    if (expression.charAt(j) == '(') {
+                        j = findClosingBracket(expression, j);
+
+                    }else{
+                        j++;
+                    }
+                    //j++;
                 }
                 terms.add(expression.substring(0, j));
                 expression = expression.substring(j);
@@ -188,6 +213,29 @@ public class Worker {
         return terms;
     }
 
+    public String postProcess(String distrib){
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i<distrib.length();i++){
+
+            if(isOperator(distrib.charAt(i)) && isOperator(distrib.charAt(i+1))){
+                sb.append(distrib.charAt(i+1));
+                i++;
+            }
+            else{
+                if(i==0 && isOperator(distrib.charAt(i))){
+                    if(distrib.charAt(i)=='-'){
+                        sb.append(distrib.charAt(i));
+                    }
+                }
+                else{
+                    sb.append(distrib.charAt(i));
+                }
+                //sb.append(distrib.charAt(i));
+            }
+        }
+        return sb.toString();
+    }
+
     public String distrib(String test) {
         StringBuilder expression = new StringBuilder();
         expression.append(test);
@@ -197,13 +245,16 @@ public class Worker {
                 int end = findClosingBracket(expression.toString(), i);
                 if (expression.substring(i + 1, end).contains("(")) {
                     String temp = distrib(expression.substring(i + 1, end));
-                    if(temp.equals(expression.substring(i + 1, end))){
+                    if(temp.equals(expression.substring(i + 1, end)) ){
                         sb.append(expression.substring(i+1, end));
                         i = end;
-                        break;
+                        //break;
                     }
-                    expression.replace(i + 1, end, temp);
-                    i=i-1;
+                    else{
+                        expression.replace(i + 1, end, temp);
+                        i=i-1;
+                    }
+
                     //System.out.println(temp);
 
                 } else {
@@ -474,34 +525,48 @@ public class Worker {
                 }
             } else if (Character.isLetterOrDigit(expression.charAt(i)) || expression.charAt(i) == '.') {
                 if(isFunc(expression.toString(), i)){
-                    int end = findClosingBracket(expression.toString(), i+1);
-                    sb.append(expression.substring(i-1, end+1));
-                    i = end;
-                    break;
-                }
-                String variable = findNextVariable(expression.toString(), i);
-                int endOfVariable = findEndOfVariable(variable, i);
-                if (isNextMultiplyOrDivideAndBrackets(expression.toString(), endOfVariable)) {
-                    if (expression.charAt(endOfVariable) == '*') {
-                        int end = findClosingBracket(expression.toString(), endOfVariable + 2);
-                        if (expression.substring(endOfVariable + 2, end).contains("(")) {
-                            String temp = distrib(expression.substring(endOfVariable + 2, end));
-                            expression.replace(endOfVariable + 2, end, temp);
-                            i=endOfVariable-1;
-                            //System.out.println(temp);
+                    int endOfVariable = findEndOfVariable(expression.toString(), i);
+                    if(endOfVariable>=expression.length()){
+
+                        if (i == 0) {
 
                         } else {
-                            List<String> first = findVariablesAndOperations(expression.toString(), endOfVariable + 2, end);
-                            List<String> second = new ArrayList<>();
-                            if (i == 0) {
-                                variable = "+" + variable;
-                            } else {
-                                variable = findOperatorForVariable(expression.toString(), i - 1) + variable;
-                            }
-                            second.add(variable);
-                            sb.append(makeMultiply(first, second));
-                            i = end;
+                            String operator = findOperatorForVariable(expression.toString(), i - 1);
+                            sb.append(operator);
+
                         }
+                        for(int j = i;j<expression.length();j++){
+                            sb.append(expression.charAt(j));
+                        }
+                        i = expression.length()-1;
+                    }
+
+                    //break;
+                }
+                else {
+                    String variable = findNextVariable(expression.toString(), i);
+                    int endOfVariable = findEndOfVariable(variable, i);
+                    if (isNextMultiplyOrDivideAndBrackets(expression.toString(), endOfVariable)) {
+                        if (expression.charAt(endOfVariable) == '*') {
+                            int end = findClosingBracket(expression.toString(), endOfVariable + 2);
+                            if (expression.substring(endOfVariable + 2, end).contains("(")) {
+                                String temp = distrib(expression.substring(endOfVariable + 2, end));
+                                expression.replace(endOfVariable + 2, end, temp);
+                                i = endOfVariable - 1;
+                                //System.out.println(temp);
+
+                            } else {
+                                List<String> first = findVariablesAndOperations(expression.toString(), endOfVariable + 2, end);
+                                List<String> second = new ArrayList<>();
+                                if (i == 0) {
+                                    variable = "+" + variable;
+                                } else {
+                                    variable = findOperatorForVariable(expression.toString(), i - 1) + variable;
+                                }
+                                second.add(variable);
+                                sb.append(makeMultiply(first, second));
+                                i = end;
+                            }
 //                        List<String> first = findVariablesAndOperations(expression.toString(), endOfVariable + 2, end);
 //                        List<String> second = new ArrayList<>();
 //                        if (i == 0) {
@@ -512,43 +577,64 @@ public class Worker {
 //                        second.add(variable);
 //                        sb.append(makeMultiply(first, second));
 //                        i = end;
-                    } else if (expression.charAt(endOfVariable) == '/') {
-                        int end = findClosingBracket(expression.toString(), endOfVariable + 2);
-                        if (expression.substring(endOfVariable + 2, end).contains("(")) {
-                            String temp = distrib(expression.substring(endOfVariable + 2, end));
-                            expression.replace(endOfVariable + 2, end, temp);
-                            i=endOfVariable-1;
-                            //System.out.println(temp);
+                        } else if (expression.charAt(endOfVariable) == '/') {
+                            int end = findClosingBracket(expression.toString(), endOfVariable + 2);
+                            if (expression.substring(endOfVariable + 2, end).contains("(")) {
+                                String temp = distrib(expression.substring(endOfVariable + 2, end));
+                                expression.replace(endOfVariable + 2, end, temp);
+                                i = endOfVariable - 1;
+                                //System.out.println(temp);
 
-                        } else {
-                            String first = expression.substring(endOfVariable + 2, end);
-                            String second = variable;
-                            sb.append(makeDivisionVariableBrackets(second, first));
-                            i = end;
-                        }
+                            } else {
+                                String first = expression.substring(endOfVariable + 2, end);
+                                String second = variable;
+                                sb.append(makeDivisionVariableBrackets(second, first));
+                                i = end;
+                            }
 //                        String first = expression.substring(endOfVariable + 2, end);
 //                        String second = variable;
 //                        sb.append(makeDivisionVariableBrackets(second, first));
 //                        i = end;
-                    }
-                } else {
-                    if (i == 0) {
-
+                        }
                     } else {
-                        variable = findOperatorForVariable(expression.toString(), i - 1) + variable;
-                    }
-                    sb.append(variable);
-                    i = endOfVariable;
+                        if (i == 0) {
 
+                        } else {
+                            String operator = findOperatorForVariable(expression.toString(), i - 1);
+                            if(operator.equals("null")){
+                                sb.append("+");
+                            }
+                            else {
+                                variable = operator + variable;
+                            }
+
+                        }
+                        sb.append(variable);
+                        i = endOfVariable;
+
+                    }
                 }
             } else if (isOperator(expression.charAt(i))) {
-            } else {
+            } else if(expression.charAt(i)==')'){
+
+            }
+            else {
                 sb.append(expression.charAt(i));
 
             }
         }
         return sb.toString();
     }
+
+    public boolean containsFunction(String substring) {
+        for (int i = 0; i < substring.length(); i++) {
+            if (substring.charAt(i) == '(' && isFunction(substring.toCharArray(), i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String makeDivisionVariableBrackets(String first, String second){
         StringBuilder sb = new StringBuilder();
         sb.append(first);
@@ -599,7 +685,7 @@ public class Worker {
                 return String.valueOf(expression.charAt(i));
             }
         }
-        return null;
+        return "+";
     }
 
     public int findClosingBracket(String expr, int startIndex) {
@@ -762,7 +848,7 @@ public class Worker {
     public String findNextVariable(String expression, int start) {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < expression.length(); i++) {
-            if (Character.isLetterOrDigit(expression.charAt(i)) || isPriorityOperator(expression.charAt(i))) {
+            if (Character.isLetterOrDigit(expression.charAt(i)) || isPriorityOperator(expression.charAt(i)) || expression.charAt(i)=='.') {
                 sb.append(expression.charAt(i));
             } else {
                 break;

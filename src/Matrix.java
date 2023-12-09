@@ -204,6 +204,7 @@ public class Matrix {
         List<Integer> functions = new ArrayList<>();
         List<String> functionProcessor = new ArrayList<>();
         List<Integer> priority = new ArrayList<>();
+        List<Integer> doneOperations = new ArrayList<>();
         boolean isInserted = false, isRequireFunction = false;
         for(int i = 0; i<8;i++){
             processors.add(new ArrayList<>());
@@ -228,7 +229,7 @@ public class Matrix {
             }
         }
         System.out.println("Functions: " + functions);
-        int processorNumber = 1, taskNumber = 0, previousTaskNumber = 0;
+        int processorNumber = 1, taskNumber = sorted.get(0), previousTaskNumber = sorted.get(0);
         for(int i = 1;i<sorted.size();i++){
             int time = Integer.MAX_VALUE, tempTime = Integer.MAX_VALUE;
             for(int j = 0;j<processors.size();j++){
@@ -237,7 +238,7 @@ public class Matrix {
                 List<List<String>> temp = new ArrayList<>();
                 coppy(processors, temp);
                 if(operationsMap.get(sorted.get(i)).getRequieredOperations().isEmpty()){
-                    if(taskNumber!=0 && previousTaskNumber!=sorted.get(i)){
+                    if(previousTaskNumber!=sorted.get(i)){
                         if(operationsMap.get(taskNumber).getOperation().equals(operationsMap.get(sorted.get(i)).getOperation())){
                             for(int l = 0;l<calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation());l++){
                                 temp.get(j).add(sorted.get(i).toString());
@@ -246,8 +247,8 @@ public class Matrix {
                         }
                         else{
                             for(int k = 0;k<processors.size();k++){
-                                if(processors.get(k).size()!=processors.get(processorNumber).size()){
-                                    while(processors.get(k).size()!=processors.get(processorNumber).size()){
+                                if(processors.get(k).size()!=calculateTime(temp)){
+                                    while(processors.get(k).size()!=calculateTime(temp)){
                                         processors.get(k).add("Empty");
                                     }
                                 }
@@ -261,9 +262,9 @@ public class Matrix {
                         }
                     }
                     else{
-//                        if(temp.get(j).size()<calculateTime(temp)){
-//                            while(temp.get(j).size()!=calculateTime(processors)){
-//                                temp.get(j).add("Empty");
+//                        if(processors.get(j).size()<calculateTime(temp)){
+//                            while(processors.get(j).size()!=calculateTime(processors)){
+//                                processors.get(j).add("Empty");
 //                            }
 //                        }
                         for(int l = 0;l<calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation());l++){
@@ -292,7 +293,7 @@ public class Matrix {
                                 }
                             }
                         }
-                        if(operationsMap.get(taskNumber).getOperation().equals(operationsMap.get(sorted.get(i)).getOperation()) && !operationsMap.get(sorted.get(i)).getRequieredOperations().contains(taskNumber) && !isRequireFunction) {
+                        if(operationsMap.get(taskNumber).getOperation().equals(operationsMap.get(sorted.get(i)).getOperation()) && !operationsMap.get(sorted.get(i)).getRequieredOperations().contains(taskNumber) && !isRequireFunction ) {
                             for(int l = 0;l<processors.size();l++){
                                 temp = new ArrayList<>();
                                 coppy(processors, temp);
@@ -491,30 +492,6 @@ public class Matrix {
                         }
 
                     }
-
-
-//                    for(Integer requiredOperationProcessor: requiredOperationProcessors){
-//                        for(int l = 0;l<calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation());l++){
-//                            temp.get(requiredOperationProcessor).add(sorted.get(i));
-//                        }
-//                        time = calculateTime(temp);
-//                        if(time<tempTime && !priority.contains(j)){
-//                            tempTime = time;
-//                            processorNumber = j;
-//                            taskNumber = sorted.get(i);
-//                            previousTaskNumber = sorted.get(i);
-//                            resultTime = time;
-//                        }
-//                        else if(time==tempTime && !priority.contains(j)){
-//                            if(processors.get(j).size()<processors.get(processorNumber).size()){
-//                                tempTime = time;
-//                                processorNumber = j;
-//                                taskNumber = sorted.get(i);
-//                                previousTaskNumber = sorted.get(i);
-//                                resultTime = time;
-//                            }
-//                        }
-//                    }
                 }
                 if(time<tempTime && priority.contains(j)){
                     tempTime = time;
@@ -532,7 +509,7 @@ public class Matrix {
                         resultTime = time;
                     }
                 }
-
+                doneOperations.add(sorted.get(i));
             }
             if(!isInserted){
 //                if(processors.get(processorNumber).size()<time-calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation())){
@@ -580,6 +557,11 @@ public class Matrix {
         return processors;
     }
 
+
+    public boolean canBePlacedHere(List<Integer> doneOperations, Map<Integer, OperationInformation> operationsMap, int operationNumber){
+
+        return true;
+    }
     public int findProcessorCloserToCenter(int proc1, int proc2, List<List<String>> processors){
 
         if ((proc1 <= 2 && proc2 <= 2)) {

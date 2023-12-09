@@ -41,24 +41,22 @@ public class Main {
     }
 
     public static void laba6(){
-        String part = "a+(b+c+d*(e+f)+g)+h+f(a)";
+        //String part = "a+(b+c+d+(e+f)+g)+h+f(a)";
+        String part = "((a+f(x))+(c+d))+((e+f)+(g+h))-f(x)";
+        //String part = "a*b*c/d+e*f*g/h+t*(a-q)-5.0*i-4*j+k+L+m*n*k*(p-1)+sin(pi*R)*log(q)/sin(3*pi/4+x*pi/2)";
         Analyzer analyzer = new Analyzer();
         ExpressionConverter expressionConverter = new ExpressionConverter();
         Worker worker = new Worker();
         String comutations = worker.generateComutations1(part);
         String distributions = worker.distrib(part);
         System.out.println("Comutations: " + comutations);
+        distributions = worker.postProcess(distributions);
         System.out.println("Distributions: " + distributions);
-        List<Character> correct = analyzer.printCorrectExpression(part, analyzer.getErrorPositions());
-        List<Character> result = expressionConverter.convertExpression(correct);
         Builder builder = new Builder();
 //        TreeNode root = builder.buildTree(new TreeNode(), result);
 //        Builder.printTree(root);
-        TreeNode root = builder.buildExpressionTree(result);
-
         System.out.println();
 //        int rootHeight = root.height();
-        TreeNode rebuild = builder.rebuild(root);
 //        TreeDrawer.startDrawing(root);
 //        TreeDrawer.startDrawing(rebuild);
         System.out.println();
@@ -66,6 +64,10 @@ public class Main {
 //        System.out.println("Second tree height: " + rebuild.height());
         Matrix matrix = new Matrix();
         //matrix.manageOperations(rebuild);
+        List<Character> correct = analyzer.printCorrectExpression(part, analyzer.getErrorPositions());
+        List<Character> result = expressionConverter.convertExpression(correct);
+        TreeNode root = builder.buildExpressionTree(result);
+        TreeNode rebuild = builder.rebuild(root);
         int first = matrix.processTree(rebuild);
         List<Character> correctCommutation = analyzer.printCorrectExpression(comutations, analyzer.getErrorPositions());
         List<Character> resultCommutation = expressionConverter.convertExpression(correctCommutation);
