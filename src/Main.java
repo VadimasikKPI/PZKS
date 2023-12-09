@@ -7,9 +7,9 @@ public class Main {
     }
 
     public static void laba5(){
-        //String part = "a+(b+c+d+(e+f)+g)+h+f(a)";
+        String part = "a+(b+c+d+(e+f)+g)+h+f(a)";
         //String part = "((a + f(x)) + (c + d)) + ((e + f) + (g + h))-f(x)";
-        String part = "a*b*c/d + e*f*g/h + t*(a-q) - 5.0*i - 4*j + k + L + m*n*k*(p-1) + sin(pi*R)*log(q)/sin(3*pi/4 + x*pi/2)";
+        //String part = "a*b*c/d + e*f*g/h + t*(a-q) - 5.0*i - 4*j + k + L + m*n*k*(p-1) + sin(pi*R)*log(q)/sin(3*pi/4 + x*pi/2)";
         Analyzer analyzer = new Analyzer();
         ExpressionConverter expressionConverter = new ExpressionConverter();
         Worker worker = new Worker();
