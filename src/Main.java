@@ -45,6 +45,7 @@ public class Main {
             i++;
         }
 
-
+        String lastDistribution = distributions.get(distributions.size()-1);
+        System.out.println("Last distribution: "+lastDistribution);
     }
 }
