@@ -133,6 +133,69 @@ public class Builder {
 
         return operands.pop();
     }
+
+    public static TreeNode addFunctionOperations(TreeNode root){
+        if (root == null) {
+            return null;
+        }
+        if(isFunc(root.value)){
+            TreeNode temp = root;
+            root.left = buildExpressionTree(getBodyExpression(root.value));
+        }
+        addFunctionOperations(root.left);
+        addFunctionOperations(root.right);
+        return root;
+    }
+
+    public static List<Character> getBodyExpression(String exp){
+        List<Character> body = new ArrayList<>();
+        for(int i = 0;i<exp.length();i++){
+            if(exp.charAt(i)=='('){
+                int end = findClosingBracket(exp, i);
+                for(int j = i+1;j<end;j++){
+                    body.add(exp.charAt(j));
+                }
+                i = end-1;
+            }
+//            else{
+//                body.add(exp.charAt(i));
+//            }
+        }
+        return body;
+    }
+
+    public static int findClosingBracket(String expr, int startIndex) {
+        int count = 1;
+        for (int i = startIndex + 1; i < expr.length(); i++) {
+            if (expr.charAt(i) == '(') {
+                count++;
+            } else if (expr.charAt(i) == ')') {
+                count--;
+                if (count == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+    public static boolean isFunc(String exp){
+        if(exp.length()==1){
+            return false;
+        }
+        for(int i = 0;i<exp.length();i++){
+            if(exp.charAt(i)=='('){
+                return true;
+            }
+            else if(isOper(exp.charAt(i))){
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isOper(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c=='^';
+    }
     public static TreeNode rebuild(TreeNode root){
         if (root == null) {
             return null;
@@ -189,6 +252,19 @@ public class Builder {
                 root.right.left = new TreeNode(root.left.right.value);
                 root.right.right = temp;
                 root.left = root.left.left;
+            }
+            else if(root.left.right!=null && root.right!=null){
+                if(Objects.equals(root.value, root.left.right.value)&& root.right.height()>=2 && root.left.right.right.height()==1){
+                    TreeNode temp = root.right;
+                    root.right = new TreeNode(root.left.right.value);
+                    root.right.left = new TreeNode(root.left.right.right.value);
+                    root.right.right = temp;
+                    root.left.right = root.left.right.left;
+                }
+                else {
+                    root.left = rebuild(root.left);
+                    root.right = rebuild(root.right);
+                }
             }
             else {
                 root.left = rebuild(root.left);

@@ -1277,6 +1277,28 @@ public class Worker {
                     }
                 }
             } else if (Character.isLetterOrDigit(expression.charAt(i)) || expression.charAt(i) == '.') {
+                if(isFunc(expression.toString(), i)){
+                    int endOfVariable = findEndOfVariable(expression.toString(), i);
+                    if(endOfVariable>=expression.length()){
+
+                        if (i == 0) {
+
+                        } else {
+                            String operator = findOperatorForVariable(expression.toString(), i - 1);
+                            sb.append(operator);
+
+                        }
+                        for(int j = i;j<expression.length();j++){
+                            sb.append(expression.charAt(j));
+                        }
+                        i = expression.length()-1;
+                    }
+
+                    //break;
+                }
+                else{
+
+
                 String variable = findNextVariable(expression.toString(), i);
                 int endOfVariable = findEndOfVariable(variable, i);
                 if (isNextMultiplyOrDivideAndBrackets(expression.toString(), endOfVariable)) {
@@ -1343,7 +1365,7 @@ public class Worker {
                     //result.add(makeStep(sb.toString(), expression.toString(), endOfVariable));
                     i = endOfVariable;
 
-                }
+                }}
             } else if (isOperator(expression.charAt(i))) {
             } else {
                 sb.append(expression.charAt(i));

@@ -8,7 +8,7 @@ public class Matrix {
     public static final int DIVIDE_VALUE = 8;
     public static final int FUNCTION_VALUE = 6;
     public int operationNumber = 1;
-    public List<List<Integer>> doneOperations = new ArrayList<>();
+    //public List<List<Integer>> doneOperations = new ArrayList<>();
 
     public List<OperationInformation> operationInformation = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class Matrix {
         }
         List<Integer> sortedOperations = new ArrayList<>();
         sortedOperations = topologicalSort(operationsMap);
-//        System.out.println("Topological order: " + sortedOperations);
+        //System.out.println("Topological order: " + sortedOperations);
         List<List<String>> result = mapAlgorithm(operationsMap, sortedOperations);
         System.out.println("Найгірший час виконання: " + worstTime(operationsMap));
         System.out.println("Час виконання: " + calculateTime(result));
@@ -224,9 +224,15 @@ public class Matrix {
         }
 
         for(int i = 0;i<functions.size();i++){
-            for(int j = 0;j<calculateNumberOfInputs(operationsMap.get(functions.get(i)).getOperation());j++){
-                functionProcessor.add(functions.get(i).toString());
+            if(operationsMap.get(functions.get(i)).getRequieredOperations().isEmpty()){
+                for(int j = 0;j<calculateNumberOfInputs(operationsMap.get(functions.get(i)).getOperation());j++){
+                    functionProcessor.add(functions.get(i).toString());
+                }
+                doneOperations.add(functions.get(i));
+                //functions.remove(i);
+                //i--;
             }
+
         }
         System.out.println("Functions: " + functions);
         int processorNumber = 1, taskNumber = sorted.get(0), previousTaskNumber = sorted.get(0);
@@ -509,7 +515,7 @@ public class Matrix {
                         resultTime = time;
                     }
                 }
-                doneOperations.add(sorted.get(i));
+
             }
             if(!isInserted){
 //                if(processors.get(processorNumber).size()<time-calculateNumberOfInputs(operationsMap.get(sorted.get(i)).getOperation())){
@@ -522,6 +528,33 @@ public class Matrix {
                 }
                 isInserted = false;
             }
+            doneOperations.add(sorted.get(i));
+            for(int m = 0; m<functions.size();m++){
+                int counter = operationsMap.get(functions.get(m)).getRequieredOperations().size();
+                if(counter==0){
+
+                }
+                else{
+                    for(int r = 0;r<doneOperations.size();r++){
+                        if(operationsMap.get(functions.get(m)).getRequieredOperations().contains(doneOperations.get(r)) && !doneOperations.contains(functions.get(m))){
+                            counter--;
+                        }
+                    }
+                    if(counter==0){
+                        if(functionProcessor.size()<calculateTime(processors)){
+                            while(functionProcessor.size()!=calculateTime(processors)){
+                                functionProcessor.add("Empty");
+                            }
+                        }
+                        for(int l = 0;l<calculateNumberOfInputs(operationsMap.get(functions.get(m)).getOperation());l++){
+                            functionProcessor.add(functions.get(m).toString());
+                        }
+                        doneOperations.add(functions.get(m));
+                    }
+                }
+
+            }
+            //System.out.println("Done: " + doneOperations);
 
         }
         for(int k = 0;k<processors.size();k++){
